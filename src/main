@@ -1,0 +1,147 @@
+import tkinter as tk
+import tkinter.messagebox
+import time
+import threading
+import os
+from playsound import playsound
+
+
+# 현재 파일의 경로
+file_path = os.path.dirname(__file__)
+
+# 알람 설정 여부를 나타내는 변수
+is_alarm_set = False
+
+
+# 출발역과 도착역에 따른 소요 시간을 반환하는 함수
+def get_travel_time(start_station, end_station):
+
+    # 출발역과 도착역에 따른 소요 시간 데이터
+    travel_time_data = {
+        ("청구역", "숭실대입구역"): 45,
+        ("청구역", "매봉역"): 26,
+        ("청구역", "홍대입구역"): 21,
+        ("약수역", "숭실대입구역"): 25,
+        ("약수역", "매봉역"): 21,
+        ("약수역", "고속터미널역"): 11,
+        ("우장산역", "숭실대입구역"): 46,
+        ("우장산역", "홍대입구역"): 27,
+        ("우장산역", "이태원역"): 39,
+        ("도봉산역", "숭실대입구역"): 59,
+        ("도봉산역", "이태원역"): 46,
+        ("도봉산역", "홍대입구역"): 52,
+        ("이수역", "숭실대입구역"): 4,
+        ("이수역", "홍대입구역"): 31,
+        ("이수역", "성수역"): 27,
+        ("도농역", "숭실대입구역"): 58,
+        ("도농역", "성수역"): 35,
+        ("도농역", "을지로입구역"): 38,
+        ("걸포북변역", "숭실대입구역"): 73,
+        ("걸포북변역", "을지로입구역"): 57,
+        ("걸포북변역", "성수역"): 67,
+        ("운정역", "숭실대입구역"): 74,
+        ("운정역", "성수역"): 73,
+        ("운정역", "을지로입구역"): 57,
+        ("서울역", "숭실대입구역"):21,
+        ("서울역", "성수역"): 23,
+        ("서울역", "홍대입구역"): 19,
+        ("신림역", "숭실대입구역"): 18,
+        ("신림역", "홍대입구역"): 21,
+        ("신림역", "삼산체육관역"): 42,
+        ("잠실새내역", "숭실대입구역"): 37,
+        ("잠실새내역", "삼산체육관역"): 69,
+        ("잠실새내역", "망우역"): 40,
+        ("망우역", "숭실대입구역"): 45,
+        ("망우역", "매봉역"): 47,
+        ("망우역", "성수역"): 26, 
+        ("삼산체육관역", "숭실대입구역"): 39,
+        ("삼산체육관역", "성수역"): 73,
+        ("삼산체육관역", "잠실새내역"): 66,
+        ("상봉역", "숭실대입구역"): 36,
+        ("상봉역", "잠실새내역"): 26,
+        ("상봉역", "서울역"): 35
+    }
+
+    # 출발역과 도착역을 키로 사용하여 소요 시간을 가져옴
+    return travel_time_data.get((start_station, end_station), 0)
+
+
+# 알람을 설정하는 함수
+def set_alarm():
+
+    global is_alarm_set
+
+    if not is_alarm_set:
+        is_alarm_set = True
+        start_station = start_entry.get() # 출발역 입력 받기
+        end_station = end_entry.get() # 도착역 입력 받기
+        seconds = get_travel_time(start_station, end_station) * 60 # 여행 시간을 초 단위로 계산
+        threading.Thread(target=wait_and_play_alarm, args=(seconds,)).start() # 스레드에서 알람 설정 함수 호출
+
+    else:
+        tkinter.messagebox.showwarning('알림', '알람을 해제하고 다시 설정해 주세요')
+
+
+# 알람을 해제하는 함수
+def stop_alarm():
+
+    global is_alarm_set
+
+    is_alarm_set = False
+
+
+# 알람까지 대기하고 알람 소리를 재생하는 함수
+def wait_and_play_alarm(seconds):
+
+    remaining_time = seconds
+
+    while remaining_time > 0:
+
+        if is_alarm_set:
+            remaining_label.config(text=f'알람까지 남은 시간: {(remaining_time-180)//60}분 {(remaining_time-180)%60}초')
+            root.update()
+            
+            # 도착하기 3분 전에 알람이 울리도록 설정
+            if remaining_time == 180:
+                playsound(file_path + '\\MP_Alarm-Clock.wav')  # 알람 소리 재생
+            
+            time.sleep(1)
+            remaining_time -= 1
+
+        else:
+            remaining_time = 0
+    remaining_label.config(text='출발역과 도착역을 입력하세요')
+
+    if is_alarm_set:
+        playsound(file_path + '\\MP_Alarm-Clock.wav') # 알람 소리 재생
+
+
+
+
+# GUI 생성
+root = tk.Tk()
+root.title("Subway Alarm")
+root.geometry("300x280")
+
+start_label = tk.Label(root, text="출발역")
+start_label.pack(pady=10)
+start_entry = tk.Entry(root)
+start_entry.pack()
+
+end_label = tk.Label(root, text="도착역")
+end_label.pack(pady=10)
+end_entry = tk.Entry(root)
+end_entry.pack()
+
+remaining_label = tk.Label(root, text="출발역과 도착역을 입력하세요", font=("Arial", 14))
+remaining_label.pack(pady=10)
+
+button = tk.Button(root, text="알람 설정", font=("Arial", 14), command=set_alarm)
+button.pack()
+
+stop_button = tk.Button(root, text="알람 해제", font=("Arial", 14), command=stop_alarm)
+stop_button.pack(pady=10)
+
+
+
+root.mainloop()
