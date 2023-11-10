@@ -1,0 +1,32 @@
+#!/bin/bash
+
+echo "폴더 이름을 입력하세요: "
+read folder_name
+
+if [ ! -d "$folder_name" ]; then
+  mkdir "$folder_name"
+  echo "폴더가 생성되었습니다."
+fi
+
+cd "$folder_name"
+
+file_count=$(ls -l | grep "^-" | wc -l)
+if [ "$file_count" -ge 5 ]; then
+  echo "이미 5개 이상의 파일이 있습니다."
+else
+  for ((i = 1; i <= 5; i++)); do
+    touch "file$i.txt"
+    echo "file$i.txt 생성됨"
+  done
+fi
+
+for file in $(ls); do
+  if [ -f "$file" ]; then
+    folder="${file%.*}" 
+    mkdir -p "$folder"
+    ln -s "../$file" "$folder/$file" 
+    echo "$file를 $folder 폴더에 링크 생성"
+  fi
+done
+
+echo "작업 완료"

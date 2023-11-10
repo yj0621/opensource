@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# 파일명
+file="DB.txt"
+
+# 파일이 이미 존재하면 덮어쓸지 여부 확인
+if [ -e "$file" ]; then
+    echo "파일 $file 이(가) 이미 있습니다. 덮어쓰시겠습니까? (y/n)"
+    read overwrite_choice
+    if [ "$overwrite_choice" == "y" ]; then
+        > "$file" # 파일 비우기
+    else
+        echo "파일 덮어쓰기를 취소했습니다."
+        exit 0
+    fi
+fi
+
+# 새 정보 입력 및 파일에 추가
+while true; do
+    echo "팀원의 이름을 입력하세요: "
+    read name
+
+    echo "팀원의 생일을 입력하세요 (YYYY-MM-DD 형식): "
+    read birthday
+
+    echo "팀원의 전화번호를 입력하세요: "
+    read phone
+
+    echo "--my friends--"
+    echo "이름: $name, 생일: $birthday, 전화번호: $phone" >> "$file"
+
+    echo "정보가 파일에 추가되었습니다."
+
+echo "더 추가하시겠습니까? (y/n)"
+    read choice
+    if [ "$choice" != "y" ]; then
+        echo "작업을 종료합니다."
+        break
+    fi
+done

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+file="DB.txt"
+
+# DB 파일 존재 확인
+if [ ! -e "$file" ]; then
+    echo "데이터베이스 파일이 존재하지 않습니다."
+    exit 1
+fi
+
+# 이름 또는 전화번호 일부로 검색
+echo "검색할 팀원의 이름 또는 전화번호 일부를 입력하세요: "
+read search_string
+
+# 검색 및 결과 출력
+search_result=$(grep -i "$search_string" "$file")
+
+if [ -z "$search_result" ]; then
+    echo "팀원 정보를 찾을 수 없습니다."
+else
+    echo "찾은 팀원 정보: $search_result"
+fi

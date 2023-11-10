@@ -1,0 +1,10 @@
+#!/bin/bash
+
+custom_ls() {
+    echo "프로그램을 시작합니다."
+    echo "함수 안으로 들어왔음"
+    arguments="$@"
+ls $argumens
+    echo "프로그램을 종료합니다."
+}
+custom_ls -l -a

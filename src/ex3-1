@@ -1,0 +1,11 @@
+#!/bin/bash
+
+number=$1
+
+counter=0
+
+while [ $counter -lt $number ]
+do
+  echo "Hello, world!"
+  counter=$((counter+1))
+done
